@@ -18,6 +18,7 @@
     "php": ">=7.2",
     "ext-json": "*",
     "dragonmantank/cron-expression": "^3.3",
+    "symfony/finder": "^5.4|^6.0",
     "pkg6/console": "^0.1",
     "pkg6/var-dumper": "^0.1"
   },

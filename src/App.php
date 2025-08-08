@@ -3,6 +3,7 @@
 namespace Pkg6\Console\Cli;
 
 use Pkg6\Console\Application;
+use Pkg6\Console\Cli\Phar\PharBuildCommand;
 use Pkg6\Console\Cli\Scheduling\ScheduleAppTrait;
 use Pkg6\Console\Cli\Scheduling\ScheduleListCommand;
 use Pkg6\Console\Cli\Scheduling\ScheduleRunCommand;
@@ -22,13 +23,16 @@ class App
      * @var array
      */
     protected $commands = [
+
+        InitCommand::class,
         /***
          * 计划任务
          */
-        InitCommand::class,
         ScheduleListCommand::class,
         ScheduleRunCommand::class,
         ScheduleWorkCommand::class,
+
+        PharBuildCommand::class,
     ];
 
     /**
