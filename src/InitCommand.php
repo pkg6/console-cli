@@ -1,8 +1,20 @@
 <?php
 
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
 
 namespace Pkg6\Console\Cli;
 
+use Composer\InstalledVersions;
 use Pkg6\Console\Command;
 use RuntimeException;
 
@@ -24,47 +36,34 @@ class InitCommand extends Command
      */
     public function handle()
     {
+        $pkg = "pkg6/console-cli";
         try {
-            $this->composer();
+            $composerFile = getcwd() . DIRECTORY_SEPARATOR . 'composer.json';
+            if ( ! file_exists($composerFile)) {
+                throw new RuntimeException("Can't find composer.json. Please run this command in the project root directory.");
+            }
+            if ( ! InstalledVersions::isInstalled($pkg)) {
+                throw new RuntimeException("The dependency is not declared. Please run the following command to add the dependency and try again：composer require pkg6/console-cli");
+            }
+            $composerData = json_decode(file_get_contents($composerFile), true);
+            if ( ! empty($composerData['name']) && $composerData['name'] == $pkg) {
+                throw new RuntimeException("Initialization is not possible in source code");
+            }
+            $this->composer($composerFile, $composerData);
             $this->app();
             @exec('composer dump-autoload');
             $this->info('init success');
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
+
         return self::SUCCESS;
     }
 
-    protected function checkInstall($composerData)
+    protected function composer($composerFile, $composerData)
     {
-        $checkInstall = false;
-        $pkg = "pkg6/console-cli";
-        if (!empty($composerData['name'])) {
-            if ($composerData['name'] == $pkg) {
-                $checkInstall = true;
-            }
-        }
-        if (!empty($composerData['require'][$pkg])) {
-            $checkInstall = true;
-        }
-        if (!empty($composerData['require-dev'][$pkg])) {
-            $checkInstall = true;
-        }
-        return $checkInstall;
-    }
-
-    protected function composer()
-    {
-        $composerFile = getcwd() . DIRECTORY_SEPARATOR . 'composer.json';
-        if (!file_exists($composerFile)) {
-            throw new RuntimeException("Can't find composer.json. Please run this command in the project root directory.");
-        }
-        $composerData = json_decode(file_get_contents($composerFile), true);
-        if (!$this->checkInstall($composerData)) {
-            throw new RuntimeException("The dependency is not declared. Please run the following command to add the dependency and try again：composer require pkg6/console-cli");
-        }
         $w = false;
-        if (!isset($composerData['autoload']['psr-4']['App\\'])) {
+        if ( ! isset($composerData['autoload']['psr-4']['App\\'])) {
             $composerData['autoload']['psr-4']['App\\'] = "app/";
             $w = true;
         }
@@ -87,13 +86,13 @@ class InitCommand extends Command
             $tmpDir . DIRECTORY_SEPARATOR . 'console-cli.tpl' => getcwd() . DIRECTORY_SEPARATOR . 'console-cli',
         ];
         foreach ($files as $src => $dst) {
-            if (!file_exists($src)) {
+            if ( ! file_exists($src)) {
                 throw new \RuntimeException("The source template file does not exist: {$src}");
             }
             // 自动创建目标目录
             $dir = dirname($dst);
-            if (!is_dir($dir)) {
-                if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
+            if ( ! is_dir($dir)) {
+                if ( ! mkdir($dir, 0777, true) && ! is_dir($dir)) {
                     throw new \RuntimeException("Unable to create directory: {$dir}");
                 }
             }

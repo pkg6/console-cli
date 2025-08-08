@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
 
 namespace Pkg6\Console\Cli\Scheduling;
 
@@ -74,16 +85,18 @@ class Event
     public function __construct($command)
     {
         $this->command = $command;
-        $this->output  = $this->getDefaultOutput();
+        $this->output = $this->getDefaultOutput();
     }
 
     /**
      * @param $description
+     *
      * @return $this
      */
     public function description($description)
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -103,6 +116,7 @@ class Event
         if (is_string($this->description)) {
             return $this->description;
         }
+
         return $this->buildCommand();
     }
 
@@ -116,11 +130,13 @@ class Event
 
     /**
      * @param $user
+     *
      * @return $this
      */
     public function user($user)
     {
         $this->user = $user;
+
         return $this;
     }
 
@@ -135,17 +151,20 @@ class Event
     /**
      * @param $location
      * @param $append
+     *
      * @return $this
      */
     public function sendOutputTo($location, $append = false)
     {
-        $this->output             = $location;
+        $this->output = $location;
         $this->shouldAppendOutput = $append;
+
         return $this;
     }
 
     /**
      * @param $location
+     *
      * @return $this
      */
     public function appendOutputTo($location)
@@ -161,11 +180,13 @@ class Event
         if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
             $this->sendOutputTo(sprintf('./runtime/scheduling-%s.log', sha1($this->mutexName())));
         }
+
         return $this;
     }
 
     /**
      * @param $callback
+     *
      * @return $this
      */
     public function when($callback)
@@ -173,11 +194,13 @@ class Event
         $this->filters[] = is_callable($callback) ? $callback : function () use ($callback) {
             return $callback;
         };
+
         return $this;
     }
 
     /**
      * @param $callback
+     *
      * @return $this
      */
     public function skip($callback)
@@ -185,6 +208,7 @@ class Event
         $this->rejects[] = is_callable($callback) ? $callback : function () use ($callback) {
             return $callback;
         };
+
         return $this;
     }
 
@@ -194,7 +218,7 @@ class Event
     public function filtersPass()
     {
         foreach ($this->filters as $callback) {
-            if (!$callback()) {
+            if ( ! $callback()) {
                 return false;
             }
         }
@@ -203,6 +227,7 @@ class Event
                 return false;
             }
         }
+
         return true;
     }
 
@@ -220,9 +245,9 @@ class Event
     public function pool()
     {
         $this->pool = true;
+
         return $this;
     }
-
 
     /**
      * @return void
@@ -235,16 +260,19 @@ class Event
 
     /**
      * @param $exitCode
+     *
      * @return $this
      */
     public function exitCode($exitCode)
     {
         $this->exitCode = $exitCode;
+
         return $this;
     }
 
     /**
      * @param Closure $callback
+     *
      * @return $this
      */
     public function onSuccess(Closure $callback)
@@ -258,6 +286,7 @@ class Event
 
     /**
      * @param Closure $callback
+     *
      * @return $this
      */
     public function onFailure(Closure $callback)
@@ -269,14 +298,15 @@ class Event
         });
     }
 
-
     /**
      * @param Closure $callback
+     *
      * @return $this
      */
     public function before(Closure $callback)
     {
         $this->beforeCallbacks[] = $callback;
+
         return $this;
     }
 
@@ -294,11 +324,13 @@ class Event
 
     /**
      * @param Closure $callback
+     *
      * @return $this
      */
     public function after(Closure $callback)
     {
         $this->afterCallbacks[] = $callback;
+
         return $this;
     }
 
@@ -324,6 +356,7 @@ class Event
 
     /**
      * @return \DateTime
+     *
      * @throws \Exception
      */
     public function getNextRunDate()
@@ -339,13 +372,13 @@ class Event
         return new CronExpression($this->expression);
     }
 
-
     /**
      * @return SymfonyProcess
      */
     public function process()
     {
         $this->process = ProcessUtils::newProcess($this->buildCommand(), (defined('BASE_PATH') ? BASE_PATH : getcwd()));
+
         return $this->process;
     }
 

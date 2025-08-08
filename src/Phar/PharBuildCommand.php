@@ -1,5 +1,17 @@
 <?php
 
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
+
 namespace Pkg6\Console\Cli\Phar;
 
 use InvalidArgumentException;
@@ -11,7 +23,6 @@ class PharBuildCommand extends Command
 {
     protected $name = 'phar:build';
     protected $description = 'Pack your project into a Phar package.';
-
 
     public function __construct()
     {
@@ -27,6 +38,7 @@ class PharBuildCommand extends Command
     {
         if (ini_get('phar.readonly') === '1') {
             $this->error("'Your configuration disabled writing phar files (phar.readonly = On), please update your configuration'");
+
             return self::FAILURE;
         }
         $path = $this->input->getOption('path');
@@ -37,13 +49,13 @@ class PharBuildCommand extends Command
 
         try {
             $builder = $this->getPharBuilder($path);
-            if (!empty($bin)) {
+            if ( ! empty($bin)) {
                 $builder->setMain($bin);
             }
-            if (!empty($name)) {
+            if ( ! empty($name)) {
                 $builder->setTarget($name);
             }
-            if (!empty($version)) {
+            if ( ! empty($version)) {
                 $builder->setVersion($version);
             }
             if (count($mount) > 0) {
@@ -54,6 +66,7 @@ class PharBuildCommand extends Command
         } catch (\Exception $exception) {
             $this->error($exception->getMessage());
         }
+
         return self::SUCCESS;
     }
 
@@ -62,14 +75,15 @@ class PharBuildCommand extends Command
         if (is_dir($path)) {
             $path = rtrim($path, '/') . '/composer.json';
         }
-        if (!is_file($path)) {
+        if ( ! is_file($path)) {
             throw new InvalidArgumentException(sprintf('The given path %s is not a readable file', $path));
         }
         $pharBuilder = new PharBuilder($path);
         $vendorPath = $pharBuilder->getPackage()->getVendorAbsolutePath();
-        if (!is_dir($vendorPath)) {
+        if ( ! is_dir($vendorPath)) {
             throw new RuntimeException('The project has not been initialized, please manually execute the command `composer install` to install the dependencies');
         }
+
         return $pharBuilder;
     }
 }

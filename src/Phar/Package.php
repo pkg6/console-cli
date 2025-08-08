@@ -1,5 +1,17 @@
 <?php
 
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
+
 namespace Pkg6\Console\Cli\Phar;
 
 use Symfony\Component\Finder\Finder;
@@ -43,6 +55,7 @@ class Package
                 $name = $this->getDirectory();
             }
         }
+
         return basename($name);
     }
 
@@ -55,6 +68,7 @@ class Package
         if (isset($this->package['config']['vendor-dir'])) {
             $vendor = $this->package['config']['vendor-dir'];
         }
+
         return $vendor . '/';
     }
 
@@ -82,12 +96,13 @@ class Package
         $bundle = new Bundle();
         $dir = $this->getDirectory();
         $vendorPath = $this->getVendorPath();
-        if (empty($this->package['autoload']) && !is_dir($dir . $vendorPath)) {
+        if (empty($this->package['autoload']) && ! is_dir($dir . $vendorPath)) {
             return $bundle;
         }
         if ($finder == null) {
             $finder = Finder::create()->files()->ignoreVCS(true)->exclude(rtrim($vendorPath, '/'))->in($dir);
         }
+
         return $bundle->addFinder($finder);
     }
 

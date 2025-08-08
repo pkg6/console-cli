@@ -1,6 +1,8 @@
 /vendor/
 /.idea/
-composer.lock
+/app/
 /console-cli
 /console-cli.phar
 /*.phar
+/.php-cs-fixer.cache
+composer.lock

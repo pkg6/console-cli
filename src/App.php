@@ -1,7 +1,21 @@
 <?php
 
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
+
 namespace Pkg6\Console\Cli;
 
+use Composer\InstalledVersions;
+use Exception;
 use Pkg6\Console\Application;
 use Pkg6\Console\Cli\Phar\PharBuildCommand;
 use Pkg6\Console\Cli\Scheduling\ScheduleAppTrait;
@@ -34,6 +48,16 @@ class App
 
         PharBuildCommand::class,
     ];
+    /**
+     * @var string|null
+     */
+    protected $version;
+
+    public function __construct()
+    {
+        $this->setVersion();
+        $this->setApplication();
+    }
 
     /**
      * @return void
@@ -43,18 +67,51 @@ class App
         // $this->addCommand(ScheduleInitCommand::class);
     }
 
-    public function addCommand(string $command)
+    /**
+     * @param string|array $commands
+     *
+     * @return $this
+     */
+    public function addCommand($commands)
     {
-        $this->commands[] = $command;
+        $commands = (array) $commands;
+        foreach ($commands as $command) {
+            $this->commands[] = $command;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setVersion()
+    {
+        $this->version = InstalledVersions::getVersion("pkg6/console-cli");
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function setApplication()
+    {
+        $this->appaction = new Application('console-cli', $this->version);
+
+        return $this;
     }
 
     /**
      * @return Application
      */
-    public function getAppaction()
+    public function getApplication()
     {
-        $this->appaction = (new Application('console-cli'))
-            ->resolveCommands($this->commands);
+        if (is_null($this->appaction)) {
+            $this->setApplication();
+        }
+        $this->appaction->resolveCommands($this->commands);
+
         return $this->appaction;
     }
 
@@ -62,13 +119,17 @@ class App
      * @param       $command
      * @param array $parameters
      * @param       $outputBuffer
+     *
      * @return int
+     *
      * @throws \Exception
      */
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
         $this->bootstrap();
-        return $this->getAppaction()->call($command, $parameters, $outputBuffer);
+
+        return $this->getApplication()
+            ->call($command, $parameters, $outputBuffer);
     }
 
     /**
@@ -83,12 +144,19 @@ class App
     /**
      * @param $input
      * @param $output
+     *
      * @return int
-     * @throws \Exception
+     *
+     * @throws Exception
      */
     public function handle($input = null, $output = null)
     {
         $this->bootstrap();
-        return $this->getAppaction()->run($input ?: new ArgvInput(), $output ?: new ConsoleOutput());
+
+        return $this->getApplication()
+            ->run(
+                $input ?: new ArgvInput(),
+                $output ?: new ConsoleOutput()
+            );
     }
 }

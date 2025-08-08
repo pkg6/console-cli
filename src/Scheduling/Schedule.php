@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
 
 namespace Pkg6\Console\Cli\Scheduling;
 
@@ -17,13 +28,16 @@ class Schedule
     /**
      * @param callable $callback
      * @param array    $parameters
+     *
      * @return CallbackEvent
      */
     public function call(callable $callback, array $parameters = [])
     {
         $this->events[] = $event = new CallbackEvent(
-            $callback, $parameters
+            $callback,
+            $parameters
         );
+
         return $event;
     }
 
@@ -31,23 +45,28 @@ class Schedule
      * @param        $command
      * @param array  $parameters
      * @param string $consoleName
+     *
      * @return Event
      */
     public function command($command, array $parameters = [], string $consoleName = '')
     {
         if (class_exists($command)) {
             $command = new $command;
-            /** @var Command $command */
+
+            /* @var Command $command */
             return $this->exec(
-                Application::formatCommandString($command->getName(), $consoleName), $parameters
+                Application::formatCommandString($command->getName(), $consoleName),
+                $parameters
             )->description($command->getDescription());
         }
+
         return $this->exec(Application::formatCommandString($command, $consoleName), $parameters);
     }
 
     /**
      * @param       $command
      * @param array $parameters
+     *
      * @return Event
      */
     public function exec($command, array $parameters = [])
@@ -56,9 +75,9 @@ class Schedule
             $command .= ' ' . $this->compileParameters($parameters);
         }
         $this->events[] = $cronEvent = new Event($command);
+
         return $cronEvent;
     }
-
 
     /**
      * @return Event[]
@@ -82,6 +101,7 @@ class Schedule
 
     /**
      * @param array $parameters
+     *
      * @return string
      */
     protected function compileParameters(array $parameters)
@@ -90,17 +110,19 @@ class Schedule
         foreach ($parameters as $key => $value) {
             if (is_array($value)) {
                 $value = $this->compileArrayInput($key, $value);
-            } elseif (!is_numeric($value) && !preg_match('/^(-.$|--.*)/i', $value)) {
+            } elseif ( ! is_numeric($value) && ! preg_match('/^(-.$|--.*)/i', $value)) {
                 $value = ProcessUtils::escapeArgument($value);
             }
             $commandArr[] = is_numeric($key) ? $value : (strpos($value, $key) !== false ? $value : "{$key}={$value}");
         }
+
         return implode(' ', $commandArr);
     }
 
     /**
      * @param       $key
      * @param array $value
+     *
      * @return string
      */
     protected function compileArrayInput($key, array $value)
@@ -117,21 +139,24 @@ class Schedule
                 $v = "{$key} {$v}";
             });
         }
+
         return implode(' ', $value);
     }
 
     /**
      * @param $haystack
      * @param $needles
+     *
      * @return bool
      */
     protected function startsWith($haystack, $needles)
     {
-        foreach ((array)$needles as $needle) {
-            if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string)$needle) {
+        foreach ((array) $needles as $needle) {
+            if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
                 return true;
             }
         }
+
         return false;
     }
 }

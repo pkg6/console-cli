@@ -1,25 +1,38 @@
 <?php
 
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
 
 namespace Pkg6\Console\Cli\Scheduling;
-
 
 trait ManagesFrequencies
 {
 
     /**
      * @param $expression
+     *
      * @return $this
      */
     public function cron($expression)
     {
         $this->expression = $expression;
+
         return $this;
     }
 
     /**
      * @param $startTime
      * @param $endTime
+     *
      * @return Event
      */
     public function between($startTime, $endTime)
@@ -30,6 +43,7 @@ trait ManagesFrequencies
     /**
      * @param $startTime
      * @param $endTime
+     *
      * @return Event
      */
     public function unlessBetween($startTime, $endTime)
@@ -40,6 +54,7 @@ trait ManagesFrequencies
     /**
      * @param $startTime
      * @param $endTime
+     *
      * @return \Closure
      */
     private function inTimeInterval($startTime, $endTime)
@@ -62,6 +77,7 @@ trait ManagesFrequencies
                 $startTime = strtotime($endTime);
             }
             $now = (new \DateTime())->getTimestamp();
+
             return $now >= $startTime && $now <= $endTime;
         };
     }
@@ -160,6 +176,7 @@ trait ManagesFrequencies
      * Schedule the event to run hourly at a given offset in the hour.
      *
      * @param array|int $offset
+     *
      * @return $this
      */
     public function hourlyAt($offset)
@@ -228,6 +245,7 @@ trait ManagesFrequencies
      * Schedule the command at a given time.
      *
      * @param string $time
+     *
      * @return $this
      */
     public function at($time)
@@ -239,14 +257,15 @@ trait ManagesFrequencies
      * Schedule the event to run daily at a given time (10:00, 19:30, etc).
      *
      * @param string $time
+     *
      * @return $this
      */
     public function dailyAt($time)
     {
         $segments = explode(':', $time);
 
-        return $this->spliceIntoPosition(2, (int)$segments[0])
-            ->spliceIntoPosition(1, count($segments) === 2 ? (int)$segments[1] : '0');
+        return $this->spliceIntoPosition(2, (int) $segments[0])
+            ->spliceIntoPosition(1, count($segments) === 2 ? (int) $segments[1] : '0');
     }
 
     /**
@@ -254,6 +273,7 @@ trait ManagesFrequencies
      *
      * @param int $first
      * @param int $second
+     *
      * @return $this
      */
     public function twiceDaily($first = 1, $second = 13)
@@ -267,6 +287,7 @@ trait ManagesFrequencies
      * @param int $first
      * @param int $second
      * @param int $offset
+     *
      * @return $this
      */
     public function twiceDailyAt($first = 1, $second = 13, $offset = 0)
@@ -384,6 +405,7 @@ trait ManagesFrequencies
      *
      * @param array|mixed $dayOfWeek
      * @param string $time
+     *
      * @return $this
      */
     public function weeklyOn($dayOfWeek, $time = '0:0')
@@ -410,6 +432,7 @@ trait ManagesFrequencies
      *
      * @param int $dayOfMonth
      * @param string $time
+     *
      * @return $this
      */
     public function monthlyOn($dayOfMonth = 1, $time = '0:0')
@@ -425,6 +448,7 @@ trait ManagesFrequencies
      * @param int $first
      * @param int $second
      * @param string $time
+     *
      * @return $this
      */
     public function twiceMonthly($first = 1, $second = 16, $time = '0:0')
@@ -440,7 +464,9 @@ trait ManagesFrequencies
      * Schedule the event to run on the last day of the month.
      *
      * @param string $time
+     *
      * @return $this
+     *
      * @throws \Exception
      */
     public function lastDayOfMonth($time = '0:0')
@@ -448,6 +474,7 @@ trait ManagesFrequencies
         $this->dailyAt($time);
         $this->dailyAt($time);
         $last = (new \DateTime())->setDate(date('Y'), date('m'), 1)->add(\DateInterval::createFromDateString('+1 month -1 day'));
+
         return $this->spliceIntoPosition(3, $last->format('d'));
     }
 
@@ -483,6 +510,7 @@ trait ManagesFrequencies
      * @param int $month
      * @param int|string $dayOfMonth
      * @param string $time
+     *
      * @return $this
      */
     public function yearlyOn($month = 1, $dayOfMonth = 1, $time = '0:0')
@@ -497,6 +525,7 @@ trait ManagesFrequencies
      * Set the days of the week the command should run on.
      *
      * @param array|mixed $days
+     *
      * @return $this
      */
     public function days($days)
@@ -506,16 +535,17 @@ trait ManagesFrequencies
         return $this->spliceIntoPosition(5, implode(',', $days));
     }
 
-
     /**
      * @param $position
      * @param $value
+     *
      * @return $this
      */
     protected function spliceIntoPosition($position, $value)
     {
-        $segments                = explode(' ', $this->expression);
+        $segments = explode(' ', $this->expression);
         $segments[$position - 1] = $value;
+
         return $this->cron(implode(' ', $segments));
     }
 }

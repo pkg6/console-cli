@@ -1,7 +1,18 @@
 <?php
 
-namespace Pkg6\Console\Cli\Phar;
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
 
+namespace Pkg6\Console\Cli\Phar;
 
 use FilesystemIterator;
 use GlobIterator;
@@ -52,12 +63,15 @@ class PharBuilder
             }
             $this->target = $target . '.phar';
         }
-        return (string)$this->target;
+
+        return (string) $this->target;
     }
 
     /**
      * Set the Phar package name.
+     *
      * @param string|TargetPhar $target
+     *
      * @return $this
      */
     public function setTarget($target)
@@ -67,6 +81,7 @@ class PharBuilder
             $target = rtrim($target, '/') . '/' . $this->getTarget();
         }
         $this->target = $target;
+
         return $this;
     }
 
@@ -76,6 +91,7 @@ class PharBuilder
     public function setVersion(string $version)
     {
         $this->version = $version;
+
         return $this;
     }
 
@@ -86,7 +102,7 @@ class PharBuilder
     {
         if ($this->main === null) {
             foreach ($this->package->getBins() as $path) {
-                if (!file_exists($this->package->getDirectory() . $path)) {
+                if ( ! file_exists($this->package->getDirectory() . $path)) {
                     throw new UnexpectedValueException('Bin file "' . $path . '" does not exist');
                 }
                 $this->main = $path;
@@ -96,16 +112,19 @@ class PharBuilder
         if ($this->main === null) {
             throw new UnexpectedValueException('Main file "' . $this->main . '" does not exist');
         }
+
         return $this->main;
     }
 
     /**
      * Set the default startup file.
+     *
      * @return $this
      */
     public function setMain(string $main)
     {
         $this->main = $main;
+
         return $this;
     }
     /**
@@ -132,7 +151,7 @@ class PharBuilder
 
         $time = microtime(true);
         $vendorPath = $this->package->getVendorAbsolutePath();
-        if (!is_dir($vendorPath)) {
+        if ( ! is_dir($vendorPath)) {
             throw new RuntimeException(sprintf('Directory %s not properly installed, did you run "composer install" ?', $vendorPath));
         }
         $target = $this->getTarget();
@@ -142,8 +161,9 @@ class PharBuilder
 
         $main = $this->getMain();
 
-        if (!file_exists($main)) {
+        if ( ! file_exists($main)) {
             $command->error(sprintf("Main entry file does not exist: %s", $main));
+
             return;
         }
         $command->info('Adding main package "' . $this->package->getName() . '"');
@@ -222,11 +242,13 @@ class PharBuilder
         if ($result === null) {
             throw new InvalidArgumentException(sprintf('Unable to parse given path %s', $path), json_last_error());
         }
+
         return $result;
     }
 
     /**
      * Gets a list of all dependent packages.
+     *
      * @return Package[]
      */
     public function getPackagesDependencies(): array
@@ -256,11 +278,13 @@ class PharBuilder
                 $packages[] = new Package($package, $this->canonicalize($dir));
             }
         }
+
         return $packages;
     }
 
     /**
      * Gets the canonicalize path, like realpath.
+     *
      * @param mixed $address
      */
     public function canonicalize($address)
@@ -271,6 +295,7 @@ class PharBuilder
             array_splice($address, $key - ($pos * 2 + 1), 2);
         }
         $address = implode('/', $address);
+
         return str_replace('./', '', $address);
     }
 
@@ -284,6 +309,7 @@ class PharBuilder
             throw new UnexpectedValueException('Path "' . $path . '" is not within base project path "' . $root . '"');
         }
         $basePath = substr($path, strlen($root));
+
         return empty($basePath) ? null : $this->canonicalize($basePath);
     }
 
@@ -294,8 +320,7 @@ class PharBuilder
      */
     protected function getSize($path): string
     {
-        return round(filesize((string)$path) / 1024, 1) . ' KiB';
+        return round(filesize((string) $path) / 1024, 1) . ' KiB';
     }
-
 
 }

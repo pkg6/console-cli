@@ -1,8 +1,18 @@
 <?php
 
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
 
 namespace Pkg6\Console\Cli\Scheduling;
-
 
 use DateTime;
 use Pkg6\Console\Application;
@@ -20,9 +30,9 @@ class ScheduleWorkCommand extends Command
      */
     protected $description = 'Start the schedule worker';
 
-
     /**
      * @return int
+     *
      * @throws \Exception
      */
     public function handle()
@@ -32,7 +42,7 @@ class ScheduleWorkCommand extends Command
         while (true) {
             usleep(100 * 1000);
             if ((new DateTime())->format('s') === '00' &&
-                !((new DateTime())
+                ! ((new DateTime())
                         ->setTime(date('H'), date('i'))
                         ->getTimestamp() == $lastExecutionStartedAt)) {
                 $executions[] = $execution = ProcessUtils::newProcess(
@@ -48,7 +58,7 @@ class ScheduleWorkCommand extends Command
             foreach ($executions as $key => $execution) {
                 $output = trim($execution->getIncrementalOutput()) .
                     trim($execution->getIncrementalErrorOutput());
-                if (!empty($output)) {
+                if ( ! empty($output)) {
                     if ($key !== $keyOfLastExecutionWithOutput) {
                         $this->info(PHP_EOL . '[' . date('c') . '] Execution #' . ($key + 1) . ' output:');
 
@@ -56,7 +66,7 @@ class ScheduleWorkCommand extends Command
                     }
                     $this->output->writeln($output);
                 }
-                if (!$execution->isRunning()) {
+                if ( ! $execution->isRunning()) {
                     unset($executions[$key]);
                 }
             }

@@ -1,8 +1,18 @@
 <?php
 
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
 
 namespace Pkg6\Console\Cli\Scheduling;
-
 
 use Pkg6\VarDumper\VarDumper;
 
@@ -23,11 +33,10 @@ class CallbackEvent extends Event
 
     public function __construct(\Closure $callback, array $parameters = [])
     {
-        $this->callback   = $callback;
+        $this->callback = $callback;
         $this->parameters = $parameters;
         parent::__construct($this->getSummaryForDisplay());
     }
-
 
     /**
      * @return false|mixed|void|null
@@ -35,8 +44,9 @@ class CallbackEvent extends Event
     public function run()
     {
         parent::callBeforeCallbacks();
-        $response       = ($this->callback)(...$this->parameters);
+        $response = ($this->callback)(...$this->parameters);
         $this->exitCode = $response === false ? 1 : 0;
+
         return $response;
     }
 
@@ -48,6 +58,7 @@ class CallbackEvent extends Event
         if (is_string($this->description)) {
             return $this->description;
         }
+
         return VarDumper::create($this->callback)->asString();
     }
 }

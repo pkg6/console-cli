@@ -1,5 +1,17 @@
 <?php
 
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
+
 namespace Pkg6\Console\Cli\Phar;
 
 use ArrayIterator;
@@ -17,16 +29,19 @@ class Bundle implements IteratorAggregate
 
     /**
      * Add a file to the resource bundle.
+     *
      * @return $this
      */
     public function addFile(string $file)
     {
         $this->resources[] = $file;
+
         return $this;
     }
 
     /**
      * @param string[] $dirs
+     *
      * @return $this
      */
     public function addDirs(array $dirs)
@@ -36,11 +51,13 @@ class Bundle implements IteratorAggregate
 
     /**
      * Add a directory package to a resource package.
+     *
      * @return $this
      */
     public function addFinder(Finder $dir)
     {
         $this->resources[] = $dir;
+
         return $this;
     }
 
@@ -57,6 +74,7 @@ class Bundle implements IteratorAggregate
                 return true;
             }
         }
+
         return false;
     }
 

@@ -1,8 +1,18 @@
 <?php
 
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
 
 namespace Pkg6\Console\Cli\Scheduling;
-
 
 use Pkg6\Console\Cli\App;
 use Pkg6\Console\Command;
@@ -20,6 +30,7 @@ class ScheduleListCommand extends Command
 
     /**
      * @return int
+     *
      * @throws \Exception
      */
     public function handle()
@@ -40,6 +51,7 @@ class ScheduleListCommand extends Command
             'Description',
             'NextDue',
         ], $rows ?? []);
+
         return self::SUCCESS;
     }
 }

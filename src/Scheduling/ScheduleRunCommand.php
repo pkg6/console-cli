@@ -1,8 +1,18 @@
 <?php
 
+/*
+ * This file is part of the pkg6/console-cli
+ *
+ * (c) pkg6 <https://github.com/pkg6>
+ *
+ * (L) Licensed <https://opensource.org/license/MIT>
+ *
+ * (A) zhiqiang <https://www.zhiqiang.wang>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
 
 namespace Pkg6\Console\Cli\Scheduling;
-
 
 use Pkg6\Console\Cli\App;
 use Pkg6\Console\Command;
@@ -40,15 +50,16 @@ class ScheduleRunCommand extends Command
     public function handle()
     {
         $this->schedule = App::$schedule;
-        $pool           = $this->option('pool');
+        $pool = $this->option('pool');
         if ($pool) {
             $this->poolProcess();
         } else {
             $this->start();
         }
-        if (!$this->eventsRan) {
+        if ( ! $this->eventsRan) {
             $this->info('No scheduled commands are ready to run.');
         }
+
         return self::SUCCESS;
     }
 
@@ -58,7 +69,7 @@ class ScheduleRunCommand extends Command
     protected function start()
     {
         foreach ($this->schedule->dueEvents() as $event) {
-            if (!$event->filtersPass()) {
+            if ( ! $event->filtersPass()) {
                 continue;
             }
             $this->line('<info>[' . date('c') . '] Running scheduled command:</info> ' . $event->getSummaryForDisplay());
@@ -85,10 +96,10 @@ class ScheduleRunCommand extends Command
                 try {
                     $process = $event->process;
                     $process && $process->checkTimeout();
-                    $isRunning = !is_null($process) ? $process->isRunning() : false;
-                    if (!$isRunning) {
+                    $isRunning = ! is_null($process) ? $process->isRunning() : false;
+                    if ( ! $isRunning) {
                         $process && $event->exitCode($process->getExitCode());
-                        /**  event callAfterCallbacks **/
+                        /*  event callAfterCallbacks **/
                         $event->callAfterCallbacks();
                         unset($this->running[$index]);
                         $this->startNextProcesses();
@@ -111,7 +122,7 @@ class ScheduleRunCommand extends Command
         while (count($this->running) < $poolSize && $this->events->valid()) {
             /** @var $event Event */
             $event = $this->events->current();
-            if (!$event->filtersPass()) {
+            if ( ! $event->filtersPass()) {
                 continue;
             }
             $this->line('<info>[' . date('c') . '] Running scheduled command:</info> ' . $event->getSummaryForDisplay());
