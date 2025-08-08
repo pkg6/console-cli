@@ -22,11 +22,6 @@
     "pkg6/console": "^0.1",
     "pkg6/var-dumper": "^0.1"
   },
-  "autoload-dev": {
-    "psr-4": {
-      "App\\": "app/"
-    }
-  },
   "bin": [
     "bin/console-cli"
   ]

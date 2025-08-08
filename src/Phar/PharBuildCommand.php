@@ -21,7 +21,6 @@ class PharBuildCommand extends Command
             ->addOption('name', '', InputOption::VALUE_OPTIONAL, 'This is the name of the Phar package, and if it is not passed in, the project name is used by default')
             ->addOption('phar-version', '', InputOption::VALUE_OPTIONAL, 'The version of the project that will be compiled.')
             ->addOption('mount', 'M', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The mount path or dir.');
-
     }
 
     protected function handle()
@@ -30,11 +29,12 @@ class PharBuildCommand extends Command
             $this->error("'Your configuration disabled writing phar files (phar.readonly = On), please update your configuration'");
             return self::FAILURE;
         }
-        $bin = $this->input->getOption('bin');
         $path = $this->input->getOption('path');
+        $bin = $this->input->getOption('bin');
         $name = $this->input->getOption('name');
         $version = $this->input->getOption('phar-version');
         $mount = $this->input->getOption('mount');
+
         try {
             $builder = $this->getPharBuilder($path);
             if (!empty($bin)) {
