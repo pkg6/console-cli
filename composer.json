@@ -1,0 +1,32 @@
+{
+  "name": "pkg6/console-cli",
+  "description": "Use PHP to integrate common commands",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "zhiqiang",
+      "email": "zhiqiang2033@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Pkg6\\Console\\Cli\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=7.2",
+    "ext-json": "*",
+    "dragonmantank/cron-expression": "^3.3",
+    "pkg6/console": "^0.1",
+    "pkg6/var-dumper": "^0.1"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  },
+  "bin": [
+    "bin/console-cli"
+  ]
+}
