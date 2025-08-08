@@ -4,8 +4,10 @@ require __DIR__ . "/vendor/autoload.php";
 
 define("BASE_PATH", __DIR__);
 
-define("CONSOLE_NAME", "console-cli");
+define("CONSOLE_NAME", "{{ bin }}");
 
 date_default_timezone_set("Asia/Shanghai");
 
-(new \App\ConsoleCliApp)->handle();
+$app = new \{{ namespace }}\{{ app_class_name }};
+
+$app->handle();

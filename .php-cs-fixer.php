@@ -13,7 +13,8 @@ This source file is subject to the MIT license that is bundled.
 EOF;
 
 $finder = PhpCsFixer\Finder::create()
-    ->in([__DIR__ . '/src',__DIR__ . '/bin']);
+    ->name('*.php')
+    ->in([__DIR__ . '/src', __DIR__ . '/bin']);
 
 return (new PhpCsFixer\Config())
     ->setRules([

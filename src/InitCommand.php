@@ -20,7 +20,11 @@ use RuntimeException;
 
 class InitCommand extends Command
 {
-
+    const consoleCliPkg = "pkg6/console-cli";
+    const initNamespace = "App";
+    const initNamespaceAs = "app";
+    const initBin = "console-cli";
+    const initClassName = "ConsoleCliApp";
     /**
      * @var string
      */
@@ -36,17 +40,16 @@ class InitCommand extends Command
      */
     public function handle()
     {
-        $pkg = "pkg6/console-cli";
         try {
             $composerFile = getcwd() . DIRECTORY_SEPARATOR . 'composer.json';
             if ( ! file_exists($composerFile)) {
                 throw new RuntimeException("Can't find composer.json. Please run this command in the project root directory.");
             }
-            if ( ! InstalledVersions::isInstalled($pkg)) {
+            if ( ! InstalledVersions::isInstalled(self::consoleCliPkg)) {
                 throw new RuntimeException("The dependency is not declared. Please run the following command to add the dependency and try again：composer require pkg6/console-cli");
             }
             $composerData = json_decode(file_get_contents($composerFile), true);
-            if ( ! empty($composerData['name']) && $composerData['name'] == $pkg) {
+            if ( ! empty($composerData['name']) && $composerData['name'] == self::consoleCliPkg) {
                 throw new RuntimeException("Initialization is not possible in source code");
             }
             $this->composer($composerFile, $composerData);
@@ -63,11 +66,11 @@ class InitCommand extends Command
     protected function composer($composerFile, $composerData)
     {
         $w = false;
-        if ( ! isset($composerData['autoload']['psr-4']['App\\'])) {
-            $composerData['autoload']['psr-4']['App\\'] = "app/";
+        if ( ! isset($composerData['autoload']['psr-4'][self::initNamespace . '\\'])) {
+            $composerData['autoload']['psr-4'][self::initNamespace . '\\'] = self::initNamespaceAs . "/";
             $w = true;
         }
-        if (isset($composerData['autoload-dev']['psr-4']['App\\'])) {
+        if (isset($composerData['autoload-dev']['psr-4'][self::initNamespace . '\\'])) {
             $w = false;
         }
         if ($w) {
@@ -77,28 +80,18 @@ class InitCommand extends Command
 
     protected function app()
     {
-        // 定位 vendor 包根目录
-        $packageRoot = __DIR__;
-        $tmpDir = $packageRoot . DIRECTORY_SEPARATOR . 'tpl';
         // 要复制的文件映射
         $files = [
-            $tmpDir . DIRECTORY_SEPARATOR . 'ConsoleCliApp.php.tpl' => getcwd() . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'ConsoleCliApp.php',
-            $tmpDir . DIRECTORY_SEPARATOR . 'console-cli.tpl' => getcwd() . DIRECTORY_SEPARATOR . 'console-cli',
+            'init_app.twig' => getcwd() . DIRECTORY_SEPARATOR . self::initNamespaceAs . DIRECTORY_SEPARATOR . self::initClassName . '.php',
+            'int_bin.twig' => getcwd() . DIRECTORY_SEPARATOR . self::initBin,
+        ];
+        $context = [
+            'bin' => self::initBin,
+            'namespace' => self::initNamespace,
+            'app_class_name' => self::initClassName,
         ];
         foreach ($files as $src => $dst) {
-            if ( ! file_exists($src)) {
-                throw new \RuntimeException("The source template file does not exist: {$src}");
-            }
-            // 自动创建目标目录
-            $dir = dirname($dst);
-            if ( ! is_dir($dir)) {
-                if ( ! mkdir($dir, 0777, true) && ! is_dir($dir)) {
-                    throw new \RuntimeException("Unable to create directory: {$dir}");
-                }
-            }
-            if (file_put_contents($dst, file_get_contents($src)) === false) {
-                throw new \RuntimeException("Failed to write tpl file: {$dst}");
-            }
+            Twig::fetchWrite($src, $dst, $context);
         }
     }
 }
